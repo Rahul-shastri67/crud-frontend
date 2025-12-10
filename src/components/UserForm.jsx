@@ -1,99 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function UserForm({ initialData, onSubmit, onCancel }) {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    city: '',
-    state: '',
-  });
+  const [form, setForm] = useState({ name: "", email: "", city: "", state: "" });
 
-  // Reset form when initialData changes
   useEffect(() => {
-    if (initialData) {
+    if (initialData)
       setForm({
-        name: initialData.name ?? '',
-        email: initialData.email ?? '',
-        city: initialData.city ?? '',
-        state: initialData.state ?? '',
+        name: initialData.name || "",
+        email: initialData.email || "",
+        city: initialData.city || "",
+        state: initialData.state || "",
       });
-    } else {
-      setForm({
-        name: '',
-        email: '',
-        city: '',
-        state: '',
-      });
-    }
+    else setForm({ name: "", email: "", city: "", state: "" });
   }, [initialData]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const submit = (e) => {
     e.preventDefault();
-
-    // If email empty → prevent crash
-    if (!form.email.trim()) {
-      alert("Email is required!");
+    if (!form.name || !form.email) {
+      alert("Name and Email are required");
       return;
     }
-
     onSubmit(form);
+    setForm({ name: "", email: "", city: "", state: "" });
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className="form" onSubmit={submit}>
       <div className="form-row">
-        <input
-          name="name"
-          placeholder="Name"
-          value={form.name}
-          onChange={handleChange}
-          required
-        />
-
-        <input
-          name="email"
-          placeholder="Email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
+        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} autoFocus />
+        <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
       </div>
 
       <div className="form-row">
-        <input
-          name="city"
-          placeholder="City"
-          value={form.city}
-          onChange={handleChange}
-        />
-
-        <input
-          name="state"
-          placeholder="State"
-          value={form.state}
-          onChange={handleChange}
-        />
+        <input name="city" placeholder="City" value={form.city} onChange={handleChange} />
+        <input name="state" placeholder="State" value={form.state} onChange={handleChange} />
       </div>
 
       <div className="form-actions">
-        <button type="submit">
-          {initialData ? 'Update' : 'Add'}
-        </button>
-
-        {initialData && (
-          <button type="button" onClick={onCancel}>
-            Cancel
-          </button>
-        )}
+        <button type="submit" className="primary">{initialData ? "Update" : "Add"}</button>
+        {initialData && <button type="button" className="ghost" onClick={onCancel}>Cancel</button>}
       </div>
     </form>
   );

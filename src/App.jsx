@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   getUsers,
   createUser,
@@ -6,28 +6,36 @@ import {
   deleteUser,
   getUsersAnalytics,
   sendNotification,
-} from './services/api';
+} from "./services/api";
 
-import UserForm from './components/UserForm';
-import UserTable from './components/UserTable';
-import Analytics from './components/Analytics';
-import Footer from './components/Footer';  // ⭐ Footer import added
+import UserForm from "./components/UserForm";
+import UserTable from "./components/UserTable";
+import Analytics from "./components/Analytics";
+import Footer from "./components/Footer";
 
-import './App.css';
+import "./App.css";
 
-function App() {
+export default function App() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [analytics, setAnalytics] = useState(null);
 
   const fetchUsers = async () => {
-    const res = await getUsers();
-    setUsers(res.data);
+    try {
+      const res = await getUsers();
+      setUsers(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const fetchAnalytics = async () => {
-    const res = await getUsersAnalytics();
-    setAnalytics(res.data);
+    try {
+      const res = await getUsersAnalytics();
+      setAnalytics(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -36,68 +44,79 @@ function App() {
   }, []);
 
   const handleSubmit = async (data) => {
-    if (editingUser) {
-      await updateUser(editingUser._id, data);
-      setEditingUser(null);
-    } else {
-      await createUser(data);
+    try {
+      if (editingUser) {
+        await updateUser(editingUser._id, data);
+        setEditingUser(null);
+      } else {
+        await createUser(data);
+      }
+      await fetchUsers();
+      await fetchAnalytics();
+    } catch (err) {
+      console.error(err);
+      alert("Save failed. See console.");
     }
-    fetchUsers();
-    fetchAnalytics();
   };
 
   const handleDelete = async (id) => {
-    await deleteUser(id);
-    fetchUsers();
-    fetchAnalytics();
+    if (!confirm("Delete this user?")) return;
+    try {
+      await deleteUser(id);
+      await fetchUsers();
+      await fetchAnalytics();
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed. See console.");
+    }
   };
 
   const handleNotify = async (userId) => {
-    await sendNotification({
-      userId,
-      subject: 'Hello from CRUD App',
-      message: 'This is a test notification.',
-    });
-    alert('Notification sent');
+    try {
+      await sendNotification({ userId, subject: "Hello", message: "Test" });
+      alert("Notification sent");
+    } catch (err) {
+      console.error(err);
+      alert("Notification failed");
+    }
   };
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>User Management Dashboard</h1>
-        <p>CRUD + Analytics + Notifications</p>
-      </header>
+    <div className="page-wrapper">
+      <div className="app-container">
+        <header className="app-header">
+          <h1>User Management Dashboard</h1>
+          <p>Simple · Clean · Centered</p>
+        </header>
 
-      <main className="app-main">
-        <section className="card">
-          <h2>{editingUser ? 'Edit User' : 'Add User'}</h2>
-          <UserForm
-            initialData={editingUser}
-            onSubmit={handleSubmit}
-            onCancel={() => setEditingUser(null)}
-          />
-        </section>
+        <main className="app-main">
+          <section className="card">
+            <h2>{editingUser ? "Edit User" : "Add User"}</h2>
+            <UserForm
+              initialData={editingUser}
+              onSubmit={handleSubmit}
+              onCancel={() => setEditingUser(null)}
+            />
+          </section>
 
-        <section className="card">
-          <h2>User List</h2>
-          <UserTable
-            users={users}
-            onEdit={setEditingUser}
-            onDelete={handleDelete}
-            onNotify={handleNotify}
-          />
-        </section>
+          <section>
+            <h2 style={{ margin: "8px 0" }}>User List</h2>
+            <UserTable
+              users={users}
+              onEdit={(u) => setEditingUser(u)}
+              onDelete={handleDelete}
+              onNotify={handleNotify}
+            />
+          </section>
 
-        <section className="card">
-          <h2>Analytics</h2>
-          <Analytics data={analytics} />
-        </section>
-      </main>
+          <section className="card">
+            <h2>Analytics</h2>
+            <Analytics data={analytics} />
+          </section>
+        </main>
 
-      <Footer />  {/* ⭐ Footer added here */}
-
+        <Footer />
+      </div>
     </div>
   );
 }
-
-export default App;
