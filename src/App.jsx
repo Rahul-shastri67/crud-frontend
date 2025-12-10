@@ -10,7 +10,7 @@ import {
 import UserForm from './components/UserForm';
 import UserTable from './components/UserTable';
 import Analytics from './components/Analytics';
-import Footer from './components/footer';
+import Footer from './components/Footer';
 import './App.css';
 
 function App() {
