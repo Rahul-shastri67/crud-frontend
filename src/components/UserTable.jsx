@@ -1,7 +1,4 @@
 export default function UserTable({ users, onEdit, onDelete, onNotify }) {
- if (!users || users.length === 0) {
-    return <p className="muted">No users found. Add a user to get started.</p>;
-  }
   return (
     <table className="user-table">
       <thead>

@@ -8,25 +8,42 @@ export default function UserForm({ initialData, onSubmit, onCancel }) {
     state: '',
   });
 
+  // Reset form when initialData changes
   useEffect(() => {
     if (initialData) {
       setForm({
-        name: initialData.name || '',
-        email: initialData.email || '',
-        city: initialData.city || '',
-        state: initialData.state || '',
+        name: initialData.name ?? '',
+        email: initialData.email ?? '',
+        city: initialData.city ?? '',
+        state: initialData.state ?? '',
       });
     } else {
-      setForm({ name: '', email: '', city: '', state: '' });
+      setForm({
+        name: '',
+        email: '',
+        city: '',
+        state: '',
+      });
     }
   }, [initialData]);
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // If email empty → prevent crash
+    if (!form.email.trim()) {
+      alert("Email is required!");
+      return;
+    }
+
     onSubmit(form);
   };
 
@@ -40,6 +57,7 @@ export default function UserForm({ initialData, onSubmit, onCancel }) {
           onChange={handleChange}
           required
         />
+
         <input
           name="email"
           placeholder="Email"
@@ -49,6 +67,7 @@ export default function UserForm({ initialData, onSubmit, onCancel }) {
           required
         />
       </div>
+
       <div className="form-row">
         <input
           name="city"
@@ -56,6 +75,7 @@ export default function UserForm({ initialData, onSubmit, onCancel }) {
           value={form.city}
           onChange={handleChange}
         />
+
         <input
           name="state"
           placeholder="State"
@@ -63,10 +83,12 @@ export default function UserForm({ initialData, onSubmit, onCancel }) {
           onChange={handleChange}
         />
       </div>
+
       <div className="form-actions">
         <button type="submit">
           {initialData ? 'Update' : 'Add'}
         </button>
+
         {initialData && (
           <button type="button" onClick={onCancel}>
             Cancel

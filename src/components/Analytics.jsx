@@ -9,7 +9,9 @@ export default function Analytics({ data }) {
         <h3>Major User Base</h3>
         {majorUserBase ? (
           <p>
-            {majorUserBase._id.city}, {majorUserBase._id.state} –{' '}
+            {majorUserBase._id.city || 'Unknown City'},
+            {' '}
+            {majorUserBase._id.state || 'Unknown State'} –{' '}
             {majorUserBase.count} users
           </p>
         ) : (
@@ -22,7 +24,10 @@ export default function Analytics({ data }) {
         <ul>
           {usersByLocation.map((item, idx) => (
             <li key={idx}>
-              {item._id.city || 'Unknown City'}, {item._id.state || 'Unknown State'}:{' '}
+              {item._id.city || 'Unknown City'},
+              {' '}
+              {item._id.state || 'Unknown State'}:
+              {' '}
               {item.count} users
             </li>
           ))}
